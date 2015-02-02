@@ -150,6 +150,8 @@ public class MainActivity extends ActionBarActivity
     Button button_der = null;
     Button button_die = null;
     Button button_das = null;
+    TextView wordsPlayedCorrectlyTextView = null;
+    TextView wordsPlayedTextView = null;
     EditText editText = null;
 
     public static PlaceholderFragment newInstance(int sectionNumber)
@@ -197,6 +199,8 @@ public class MainActivity extends ActionBarActivity
       button_der = (Button) rootView.findViewById(R.id.button_der);
       button_die = (Button) rootView.findViewById(R.id.button_die);
       button_das = (Button) rootView.findViewById(R.id.button_das);
+      wordsPlayedCorrectlyTextView = (TextView) rootView.findViewById(R.id.wordsPlayedCorrectlyTextView);
+      wordsPlayedTextView = (TextView) rootView.findViewById(R.id.wordsPlayedTextView);
       editText = (EditText) rootView.findViewById(R.id.editText);
 
       button_der.setOnClickListener(this);
@@ -274,10 +278,10 @@ public class MainActivity extends ActionBarActivity
 
     protected void showStatistics()
     {
-      double percentage = (double)wordsPLayedCorrectly/(double) wordsPlayed;
-      currentWordTextView.setText(getCurrentWord());
+      double percentage = (double)wordsPLayedCorrectly/(double)wordsPlayed;
+      wordsPlayedCorrectlyTextView.setText(Integer.toString(wordsPLayedCorrectly));
+      wordsPlayedTextView.setText("/" + Integer.toString(wordsPlayed) + " (" + String.format("%.0f%%", percentage*100) + ")");
     }
-
 
     protected String getCurrentWordEntry()
     {
