@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class MainActivity extends ActionBarActivity
@@ -267,9 +268,8 @@ public class MainActivity extends ActionBarActivity
 
     protected void showNextWord()
     {
-      ++currentWordIndex;
-      if (currentWordIndex == words.size())
-        currentWordIndex = 0;
+      Random rnd = new Random();
+      currentWordIndex = rnd.nextInt(words.size());
       currentWordTextView.setText(getCurrentWord());
     }
 
