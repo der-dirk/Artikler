@@ -169,19 +169,16 @@ public class MainActivity extends ActionBarActivity
 
     protected List<String> readStringListFromInStream(InputStream in) throws IOException
     {
-      List<String> stringList = new ArrayList<String>();
+      List<String> stringList = new ArrayList<>();
       InputStreamReader is = new InputStreamReader(in);
-      //StringBuilder sb = new StringBuilder();
       BufferedReader br = new BufferedReader(is);
       String read = br.readLine();
 
       while(read!=null)
-
       {
-        //System.out.println(read);
-        //sb.append(read);
         read = br.readLine();
-        stringList.add(read);
+        if (read!=null)
+          stringList.add(read);
       }
 
       return stringList;//sb.toString();
