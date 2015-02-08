@@ -18,11 +18,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -168,23 +163,6 @@ public class MainActivity extends ActionBarActivity
     {
     }
 
-    protected List<String> readStringListFromInStream(InputStream in) throws IOException
-    {
-      List<String> stringList = new ArrayList<>();
-      InputStreamReader is = new InputStreamReader(in);
-      BufferedReader br = new BufferedReader(is);
-      String read = br.readLine();
-
-      while(read!=null)
-      {
-        read = br.readLine();
-        if (read!=null)
-          stringList.add(read);
-      }
-
-      return stringList;//sb.toString();
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
@@ -208,10 +186,11 @@ public class MainActivity extends ActionBarActivity
       lastwrongArticleTextView.setPaintFlags(lastwrongArticleTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
       AssetManager am = getActivity().getAssets();
-      try
+
+      TextFileWordlistReader wr = new TextFileWordlistReader("wortliste.txt");
+      if(wr.read(getActivity()))
       {
-        InputStream is = am.open("wortliste.txt");
-        words = readStringListFromInStream(is);
+        words = wr.getWordlist();
         StringBuilder builder = new StringBuilder();
         for(String s : words)
         {
@@ -221,7 +200,7 @@ public class MainActivity extends ActionBarActivity
         editText.setText(builder.toString());
         showNextWord();
       }
-      catch(IOException e)
+      else
       {
         editText.setText("Error reading file");
       }
