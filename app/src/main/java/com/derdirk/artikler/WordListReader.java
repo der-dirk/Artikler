@@ -4,8 +4,8 @@ import android.content.Context;
 
 import java.util.List;
 
-public interface WordlistReader
+public interface WordListReader
 {
-  public boolean read(Context context);
+  public boolean read();
   public List<String> getWordlist();
 }

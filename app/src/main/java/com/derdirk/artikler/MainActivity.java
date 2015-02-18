@@ -135,14 +135,13 @@ public class MainActivity extends ActionBarActivity
      * number.
      */
 
-    private List<String> words;
-    private int currentWordIndex = 0;
     private int wordsPlayed = 0;
-    private int wordsPLayedCorrectly = 0;
+    private int wordsPlayedCorrectly = 0;
+    private WordList _wordList = null;
 
     TextView currentWordTextView = null;
     TextView lastWordTextView = null;
-    TextView lastwrongArticleTextView = null;
+    TextView lastWrongArticleTextView = null;
     Button button_der = null;
     Button button_die = null;
     Button button_das = null;
@@ -170,7 +169,7 @@ public class MainActivity extends ActionBarActivity
       View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
       currentWordTextView = (TextView) rootView.findViewById(R.id.currentWordTextView);
-      lastwrongArticleTextView = (TextView) rootView.findViewById(R.id.lastwrongArticleTextView);
+      lastWrongArticleTextView = (TextView) rootView.findViewById(R.id.lastwrongArticleTextView);
       lastWordTextView = (TextView) rootView.findViewById(R.id.lastWordTextView);
       button_der = (Button) rootView.findViewById(R.id.button_der);
       button_die = (Button) rootView.findViewById(R.id.button_die);
@@ -183,26 +182,29 @@ public class MainActivity extends ActionBarActivity
       button_die.setOnClickListener(this);
       button_das.setOnClickListener(this);
 
-      lastwrongArticleTextView.setPaintFlags(lastwrongArticleTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+      lastWrongArticleTextView.setPaintFlags(lastWrongArticleTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
       AssetManager am = getActivity().getAssets();
 
-      TextFileWordlistReader wr = new TextFileWordlistReader("wortliste.txt");
-      if(wr.read(getActivity()))
+      _wordList = new WordList(new TextFileWordlistReader("wortliste.txt", getActivity()));
       {
-        words = wr.getWordlist();
-        StringBuilder builder = new StringBuilder();
-        for(String s : words)
+        List<String> words = _wordList.getAllWords();
+        if (!words.isEmpty())
         {
-          builder.append(s);
-          builder.append("\n");
+
+          StringBuilder builder = new StringBuilder();
+          for (String s : words)
+          {
+            builder.append(s);
+            builder.append("\n");
+          }
+          editText.setText(builder.toString());
+          showNextWord();
         }
-        editText.setText(builder.toString());
-        showNextWord();
-      }
-      else
-      {
-        editText.setText("Error reading file");
+        else
+        {
+          editText.setText("Error reading file");
+        }
       }
 
       return rootView;
@@ -227,52 +229,37 @@ public class MainActivity extends ActionBarActivity
       else if (v.getId() == R.id.button_das)
         chosenArticle = "das";
 
-      if (!getCurrentWordArticle().equals(chosenArticle))
+      if (!_wordList.getCurrentWordArticle().equals(chosenArticle))
       {
-        lastwrongArticleTextView.setText(chosenArticle);
-        lastwrongArticleTextView.setVisibility(View.VISIBLE);
+        lastWrongArticleTextView.setText(chosenArticle);
+        lastWrongArticleTextView.setVisibility(View.VISIBLE);
       }
       else
       {
-        ++wordsPLayedCorrectly;
-        lastwrongArticleTextView.setVisibility(View.GONE);
-        lastwrongArticleTextView.setText("");
+        ++wordsPlayedCorrectly;
+        lastWrongArticleTextView.setVisibility(View.GONE);
+        lastWrongArticleTextView.setText("");
       }
 
       ++wordsPlayed;
-      lastWordTextView.setText(getCurrentWordEntry());
+      lastWordTextView.setText(_wordList.getCurrentWordEntry());
       showNextWord();
       showStatistics();
     }
 
     protected void showNextWord()
     {
-      Random rnd = new Random();
-      currentWordIndex = rnd.nextInt(words.size());
-      currentWordTextView.setText(getCurrentWord());
+      _wordList.next();
+      currentWordTextView.setText(_wordList.getCurrentWord());
     }
 
     protected void showStatistics()
     {
-      double percentage = (double)wordsPLayedCorrectly/(double)wordsPlayed;
-      wordsPlayedCorrectlyTextView.setText(Integer.toString(wordsPLayedCorrectly));
+      double percentage = (double) wordsPlayedCorrectly /(double)wordsPlayed;
+      wordsPlayedCorrectlyTextView.setText(Integer.toString(wordsPlayedCorrectly));
       wordsPlayedTextView.setText("/" + Integer.toString(wordsPlayed) + " (" + String.format("%.0f%%", percentage*100) + ")");
     }
 
-    protected String getCurrentWordEntry()
-    {
-      return (String)(words.toArray()[currentWordIndex]);
-    }
-
-    protected String getCurrentWord()
-    {
-      return getCurrentWordEntry().split(" ")[1];
-    }
-
-    protected String getCurrentWordArticle()
-    {
-      return getCurrentWordEntry().split(" ")[0];
-    }
   }
 
 }

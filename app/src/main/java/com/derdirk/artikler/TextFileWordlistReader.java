@@ -10,19 +10,22 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextFileWordlistReader implements WordlistReader
+public class TextFileWordlistReader implements WordListReader
 {
   private String _filename;
+  private Context _context;
   private List<String> _wordlist;
 
-  public TextFileWordlistReader(String filename)
+  public TextFileWordlistReader(String filename, Context context)
   {
     _filename = filename;
+    _context = context;
   }
 
-  public boolean read(Context context)
+  @Override
+  public boolean read()
   {
-    AssetManager am = context.getAssets();
+    AssetManager am = _context.getAssets();
     try
     {
       _wordlist = new ArrayList<>();
@@ -46,6 +49,7 @@ public class TextFileWordlistReader implements WordlistReader
     return true;
   }
 
+  @Override
   public List<String> getWordlist()
   {
     return _wordlist;
