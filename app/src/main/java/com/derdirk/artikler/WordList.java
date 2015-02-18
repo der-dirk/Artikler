@@ -17,6 +17,16 @@ public class WordList
     _words = getAllWords();
   }
 
+  public int getCurrentWordIndex()
+  {
+    return _currentWordIndex;
+  }
+
+  public void setCurrentWordIndex(int currentWordIndex)
+  {
+    _currentWordIndex = currentWordIndex;
+  }
+
   public void next()
   {
     _currentWordIndex = _rnd.nextInt(_words.size());

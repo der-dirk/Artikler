@@ -1,7 +1,7 @@
 package com.derdirk.artikler;
 
 import android.app.Activity;
-import android.content.res.AssetManager;
+import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,9 +18,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.List;
-import java.util.Random;
-
 
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks
@@ -36,11 +33,21 @@ public class MainActivity extends ActionBarActivity
    */
   private CharSequence mTitle;
 
+  private WordList _wordList = null;
+
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    if (_wordList == null)
+      _wordList = new WordList(new TextFileWordlistReader("wortliste.txt",this));
+
+    // TODO: Don't do twice
+    // Restore preferences
+    SharedPreferences settings = getSharedPreferences("Artikler", MODE_PRIVATE);
+    _wordList.setCurrentWordIndex(settings.getInt("CurrentWordIndex", 0));
 
     mNavigationDrawerFragment = (NavigationDrawerFragment)
             getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -50,6 +57,29 @@ public class MainActivity extends ActionBarActivity
     mNavigationDrawerFragment.setUp(
             R.id.navigation_drawer,
             (DrawerLayout) findViewById(R.id.drawer_layout));
+
+  }
+
+  @Override
+  protected void onResume()
+  {
+    super.onResume();
+
+    // TODO: Don't do twice
+    // Restore preferences
+    SharedPreferences settings = getSharedPreferences("Artikler", MODE_PRIVATE);
+    _wordList.setCurrentWordIndex(settings.getInt("CurrentWordIndex", 0));
+  }
+  @Override
+  protected void onPause()
+  {
+    super.onPause();
+
+    // Save preferences
+    SharedPreferences settings = getSharedPreferences("Artikler", MODE_PRIVATE);
+    SharedPreferences.Editor editor = settings.edit();
+    editor.putInt("CurrentWordIndex", _wordList.getCurrentWordIndex());
+    editor.commit();
   }
 
   @Override
@@ -184,28 +214,28 @@ public class MainActivity extends ActionBarActivity
 
       lastWrongArticleTextView.setPaintFlags(lastWrongArticleTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
-      AssetManager am = getActivity().getAssets();
+      _wordList = ((MainActivity)getActivity())._wordList;
+      currentWordTextView.setText(_wordList.getCurrentWord());
 
-      _wordList = new WordList(new TextFileWordlistReader("wortliste.txt", getActivity()));
-      {
-        List<String> words = _wordList.getAllWords();
-        if (!words.isEmpty())
-        {
-
-          StringBuilder builder = new StringBuilder();
-          for (String s : words)
-          {
-            builder.append(s);
-            builder.append("\n");
-          }
-          editText.setText(builder.toString());
-          showNextWord();
-        }
-        else
-        {
-          editText.setText("Error reading file");
-        }
-      }
+//      {
+//        List<String> words = _wordList.getAllWords();
+//        if (!words.isEmpty())
+//        {
+//
+//          StringBuilder builder = new StringBuilder();
+//          for (String s : words)
+//          {
+//            builder.append(s);
+//            builder.append("\n");
+//          }
+//          editText.setText(builder.toString());
+//          showWord();
+//        }
+//        else
+//        {
+//          editText.setText("Error reading file");
+//        }
+//      }
 
       return rootView;
     }
@@ -243,14 +273,9 @@ public class MainActivity extends ActionBarActivity
 
       ++wordsPlayed;
       lastWordTextView.setText(_wordList.getCurrentWordEntry());
-      showNextWord();
-      showStatistics();
-    }
-
-    protected void showNextWord()
-    {
       _wordList.next();
       currentWordTextView.setText(_wordList.getCurrentWord());
+      showStatistics();
     }
 
     protected void showStatistics()

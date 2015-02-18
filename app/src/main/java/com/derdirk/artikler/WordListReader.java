@@ -1,7 +1,5 @@
 package com.derdirk.artikler;
 
-import android.content.Context;
-
 import java.util.List;
 
 public interface WordListReader
